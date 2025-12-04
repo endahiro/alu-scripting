@@ -9,25 +9,20 @@ def top_ten(subreddit):
     Args:
         subreddit (str): Name of the subreddit.
 
-    If the subreddit is invalid, prints 'None'.
+    If the subreddit is invalid or has no hot posts, prints 'None'.
     """
     if not isinstance(subreddit, str) or subreddit == "":
         print("None")
         return
 
-    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {
-        "User-Agent": "alu-scripting:v1.0 (by u/alu_student_bot)"
-    }
-    params = {"limit": 10}
+    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+    headers = {"User-Agent": "My User Agent 1.0"}
 
     try:
         response = requests.get(
             url,
             headers=headers,
-            params=params,
-            allow_redirects=False,
-            timeout=10
+            allow_redirects=False
         )
     except requests.RequestException:
         print("None")
@@ -38,13 +33,11 @@ def top_ten(subreddit):
         return
 
     data = response.json().get("data", {})
-    children = data.get("children", [])
+    posts = data.get("children", None)
 
-    if not children:
+    if not posts:
         print("None")
         return
 
-    for post in children:
-        title = post.get("data", {}).get("title")
-        if title is not None:
-            print(title)
+    for post in posts[:10]:
+        print(post.get("data", {}).get("title"))
